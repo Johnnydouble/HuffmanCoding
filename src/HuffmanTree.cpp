@@ -50,9 +50,32 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     cout << "boobear";
 }
 
+void addCharToTree(HuffmanNode*& root, string& bits, char c){
+    if(root == nullptr){
+        if(bits.size() == 0){
+            root = new HuffmanNode(c, 5);
+        } else {
+            root = new HuffmanNode();
+        }
+    } else {
+        char bit = bits[bits.size() - 1];
+        bits = bits.substr(bits.size() - 1);
+        if(bit == '0'){
+            addCharToTree(root->zero, bits, c);
+        } else {
+            addCharToTree(root->one, bits, c);
+        }
+    }
+}
 
 HuffmanTree::HuffmanTree(std::istream* in) {
-
+    string c;
+    string bits;
+    while(in->good()){
+        std::getline(*in, c);
+        std::getline(*in, bits);
+        addCharToTree(treeRoot, bits, stoi(c));
+    }
 }
 
 // template<typename T>
