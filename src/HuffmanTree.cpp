@@ -50,32 +50,38 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     cout << "boobear";
 }
 
-void addCharToTree(HuffmanNode*& root, string& bits, char c){
-    if(root == nullptr){
-        if(bits.size() == 0){
-            root = new HuffmanNode(c, 5);
-        } else {
-            root = new HuffmanNode();
-        }
+void addCharToTree(HuffmanNode*& root, std::istream* bits, char c){
+    char curBit = bits->get();
+    if(curBit == '\n' || curBit == '\r'){
+        root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
     } else {
-        char bit = bits[bits.size() - 1];
-        bits = bits.substr(bits.size() - 1);
-        if(bit == '0'){
+        if(root == nullptr){
+            root = new HuffmanNode(); 
+        }
+        if(curBit == '0'){
             addCharToTree(root->zero, bits, c);
         } else {
-            addCharToTree(root->one, bits, c);
+            addCharToTree(root->one, bits,c );
+        }
+    }
+}
+
+void trimLineEndings(std::string& str){
+    for (int i = 0; i < str.length(); i++){
+        if(str[i] == '\r' || str[i] == '\n'){
+            str.erase(i, 1);
         }
     }
 }
 
 HuffmanTree::HuffmanTree(std::istream* in) {
-    string c;
-    string bits;
+    string charData;
     while(in->good()){
-        std::getline(*in, c);
-        std::getline(*in, bits);
-        addCharToTree(treeRoot, bits, stoi(c));
+        getline(*in, charData);
+        trimLineEndings(charData);
+        addCharToTree(treeRoot, in, (char)stoi(charData));
     }
+    cout << "nothing\nnothing\nnothing\nnothing\nnothing\n" << endl;
 }
 
 // template<typename T>
