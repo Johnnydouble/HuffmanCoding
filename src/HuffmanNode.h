@@ -1,10 +1,12 @@
+#include "huffmanConstants.h"
+
 struct HuffmanNode {
     char c;
     int freq;
     HuffmanNode* zero;
     HuffmanNode* one;
 
-    HuffmanNode(char c = '_', int freq = 0, 
+    HuffmanNode(char c = '*', int freq = 0, 
         HuffmanNode* zero = nullptr, HuffmanNode* one = nullptr);
     bool isLeaf() const;
 

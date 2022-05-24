@@ -5,7 +5,8 @@
 #include <queue>
 
 class HuffmanTree {
-    HuffmanNode* treeRoot; 
+    HuffmanNode* treeRoot;
+    std::map<char, std::string> charBinMap;
 public:
     HuffmanTree(std::map<char, int>& counts);
     HuffmanTree(std::istream* in);

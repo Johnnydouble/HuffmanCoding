@@ -1,14 +1,40 @@
 #include "HuffmanTree.h"
 
+void printBT(const std::string& prefix, const HuffmanNode* node, bool isLeft) //                                     remove this
+{
+    if( node != nullptr )
+    {
+        std::cout << prefix;
+
+        std::cout << (isLeft ? "├──" : "└──" );
+
+        // print the value of the node
+        std::cout << node->c << std::endl;
+
+        // enter the next tree level - left and right branch
+        printBT( prefix + (isLeft ? "│   " : "    "), node->zero, true);
+        printBT( prefix + (isLeft ? "│   " : "    "), node->one, false);
+    }
+}
+
+void printBT(const HuffmanNode* node)
+{
+    printBT("", node, false);    
+}
+
+
+
 HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     //fill priority queue
     auto cmp = [](HuffmanNode* h1, HuffmanNode* h2){
-        return h1->freq < h2->freq;
+        return h1->freq > h2->freq;
     };
     std::priority_queue<HuffmanNode*, vector<HuffmanNode*>, decltype(cmp)> pq(cmp);
+    
     for (auto& pair : counts) {
         pq.push(new HuffmanNode(pair.first, pair.second));
     }
+    pq.push(new HuffmanNode(FILE_END, 0)); //add EOF representation
 
     HuffmanNode* uno;
     HuffmanNode* dos;
@@ -20,22 +46,73 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     }
 
     treeRoot = pq.top();
+    printBT(this->treeRoot);
     cout << "boobear";
 }
+
 
 HuffmanTree::HuffmanTree(std::istream* in) {
 
 }
 
+// template<typename T>
+void encodingHelper(HuffmanNode* root, string& accumulator, std::map<char, std::string>& output){   //eliminate output param if make class member
+    if(root != nullptr){
+        if(root->isLeaf()){
+            output[root->c] = accumulator;
+        }
+
+        accumulator += "0"; //choose 0
+        encodingHelper(root->zero, accumulator, output);
+        accumulator[accumulator.length() - 1] = '1'; //unchoose 0    choose 1
+        encodingHelper(root->one, accumulator, output);
+        accumulator = accumulator.substr(accumulator.length() - 1); //unchoose 1
+    }
+}
+
 std::map<char, std::string> HuffmanTree::createEncodings() {
-    std::map<char, std::string> charBinMap;
+    if(charBinMap.size() == 0){
+    // std::map<char, std::string> charBinMap;
+        std::string accumulator;
+        encodingHelper(treeRoot, accumulator, charBinMap);
+    }
     return charBinMap;
 }
 
-void HuffmanTree::compress(ifstream* input, OBitStream* output) {
+void condThrowNPE(bool shouldThrow, string message){
+    if(shouldThrow){
+        throw message;
+    }
+}
 
+void HuffmanTree::compress(ifstream* input, OBitStream* output) {
+    condThrowNPE(input == nullptr || output == nullptr, 
+        "Neither parameter of decompress may be nullptr");
+    char c;
+    while (input->good()){
+        input->read(&c, 1); 
+        output->writeBits(createEncodings()[c]);
+    }
+    
+}
+
+char decompHelper(HuffmanNode* root, IBitStream* input, OBitStream* output){   //eliminate root param if make class member
+    if(root->isLeaf()){
+        return root->c;
+    } else {
+        int res = input->readBit();
+        if(res == 1){
+            return decompHelper(root->one, input, output);
+        } else {
+            return decompHelper(root->zero, input, output);
+        }
+    }
 }
 
 void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
-
+    condThrowNPE(input == nullptr || output == nullptr, 
+        "Neither parameter of decompress may be nullptr");
+    while(input->good()){
+        output->write(decompHelper(treeRoot, input, output));
+    }
 }

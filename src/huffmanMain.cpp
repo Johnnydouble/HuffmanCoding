@@ -142,7 +142,7 @@ void encode() {
 }
 
 
-int main2() {
+int main() {
     cout << "This program can encode a file with a Huffman code ";
     cout << "or decode a file with a Huffman code." << endl;
     cout << "(e)ncode or (d)ecode? ";
