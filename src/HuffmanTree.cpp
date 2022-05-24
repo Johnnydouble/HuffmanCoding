@@ -86,14 +86,13 @@ HuffmanTree::HuffmanTree(std::istream* in) {
     string charData;
     string garbageData;
 
+
     if(in->good()){
-        *in >> charData;
-        std::getline(*in, garbageData); //hoover up line endings
-    }
-    while(in->good()){
-        addCharToTree(treeRoot, in, (char)stoi(charData));
-        *in >> charData;
-        std::getline(*in, garbageData); //hoover up line endings
+        do {   
+            *in >> charData;
+            std::getline(*in, garbageData); //hoover up line endings
+            addCharToTree(treeRoot, in, (char)stoi(charData));
+        } while (in->good());
     }
 
     printBT(this->treeRoot);
