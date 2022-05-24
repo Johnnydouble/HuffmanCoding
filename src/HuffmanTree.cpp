@@ -60,7 +60,7 @@ void addCharToTree(HuffmanNode*& root, std::istream* bits, char c){
     char curBit = bits->get();
     if(curBit == '\r' || curBit == '\n'){
         root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
-    } else if(curBit != FILE_END) { //if the stream is NOT empty
+    } else /*if(curBit != FILE_END)*/ { //if the stream is NOT empty
         if(root == nullptr){
             root = new HuffmanNode(); 
         }
@@ -85,11 +85,17 @@ void trimLineEndings(std::string& str){
 HuffmanTree::HuffmanTree(std::istream* in) {
     string charData;
     string garbageData;
-    while(in->good()){
-        *in >> charData; 
-        std::getline(*in, garbageData);
-        addCharToTree(treeRoot, in, (char)stoi(charData));
+
+    if(in->good()){
+        *in >> charData;
+        std::getline(*in, garbageData); //hoover up line endings
     }
+    while(in->good()){
+        addCharToTree(treeRoot, in, (char)stoi(charData));
+        *in >> charData;
+        std::getline(*in, garbageData); //hoover up line endings
+    }
+
     printBT(this->treeRoot);
     cout << "REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | "<< endl;
 }
