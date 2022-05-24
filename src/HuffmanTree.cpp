@@ -47,21 +47,22 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
 
     treeRoot = pq.top();
     printBT(this->treeRoot);
-    cout << "boobear";
 }
 
 void addCharToTree(HuffmanNode*& root, std::istream* bits, char c){
     char curBit = bits->get();
-    if(curBit == '\n' || curBit == '\r'){
+    if(curBit == '\r' || curBit == '\n'){
         root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
-    } else {
+    } else if(curBit != -1) { //if the stream
         if(root == nullptr){
             root = new HuffmanNode(); 
         }
         if(curBit == '0'){
             addCharToTree(root->zero, bits, c);
-        } else {
+        } else if (curBit == '1'){
             addCharToTree(root->one, bits,c );
+        } else {
+            cout << "FUCK" << endl;
         }
     }
 }
@@ -76,9 +77,12 @@ void trimLineEndings(std::string& str){
 
 HuffmanTree::HuffmanTree(std::istream* in) {
     string charData;
+    string garbageData;
     while(in->good()){
-        getline(*in, charData);
-        trimLineEndings(charData);
+        // getline(*in, charData);
+        // trimLineEndings(charData);
+        *in >> charData; 
+        std::getline(*in, garbageData);
         addCharToTree(treeRoot, in, (char)stoi(charData));
     }
     cout << "nothing\nnothing\nnothing\nnothing\nnothing\n" << endl;
