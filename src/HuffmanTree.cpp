@@ -9,7 +9,13 @@ void printBT(const std::string& prefix, const HuffmanNode* node, bool isLeft) //
         std::cout << (isLeft ? "├──" : "└──" );
 
         // print the value of the node
-        std::cout << node->c << std::endl;
+        if(node->c == '*'){
+            std::cout << "─┐" << std::endl;
+        } else if (node->c == '\n'){
+            std::cout << "\\n" << std::endl;
+        } else {
+            std::cout << node->c << std::endl;
+        }
 
         // enter the next tree level - left and right branch
         printBT( prefix + (isLeft ? "│   " : "    "), node->zero, true);
@@ -34,15 +40,16 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     for (auto& pair : counts) {
         pq.push(new HuffmanNode(pair.first, pair.second));
     }
-    pq.push(new HuffmanNode(FILE_END, 0)); //add EOF representation
+    pq.push(new HuffmanNode(FILE_END, 1)); //add EOF representation
 
     HuffmanNode* uno;
     HuffmanNode* dos;
     while (pq.size() > 1) {
         uno = pq.top(); pq.pop();
         dos = pq.top(); pq.pop();
-
-        pq.push(new HuffmanNode('*', uno->freq + dos->freq, uno, dos));
+        HuffmanNode* res = new HuffmanNode('*', uno->freq + dos->freq, uno, dos);
+        std::cout << "";
+        pq.push(res);
     }
 
     treeRoot = pq.top();
@@ -53,16 +60,16 @@ void addCharToTree(HuffmanNode*& root, std::istream* bits, char c){
     char curBit = bits->get();
     if(curBit == '\r' || curBit == '\n'){
         root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
-    } else if(curBit != -1) { //if the stream is NOT empty
+    } else if(curBit != FILE_END) { //if the stream is NOT empty
         if(root == nullptr){
             root = new HuffmanNode(); 
         }
         if(curBit == '0'){
             addCharToTree(root->zero, bits, c);
         } else if (curBit == '1'){
-            addCharToTree(root->one, bits,c );
+            addCharToTree(root->one, bits, c);
         } else {
-            cout << "FUCK" << endl;
+            cout << "FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | " << endl; //                                                                                  remove
         }
     }
 }
@@ -79,33 +86,35 @@ HuffmanTree::HuffmanTree(std::istream* in) {
     string charData;
     string garbageData;
     while(in->good()){
-        // getline(*in, charData);
-        // trimLineEndings(charData);
         *in >> charData; 
         std::getline(*in, garbageData);
         addCharToTree(treeRoot, in, (char)stoi(charData));
     }
-    cout << "nothing\nnothing\nnothing\nnothing\nnothing\n" << endl;
+    printBT(this->treeRoot);
+    cout << "REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | "<< endl;
 }
 
 // template<typename T>
-void encodingHelper(HuffmanNode* root, string& accumulator, std::map<char, std::string>& output){   //eliminate output param if make class member
+void HuffmanTree::encodingHelper(HuffmanNode* root, string& accumulator, std::map<char, std::string>& output){   //eliminate output param if make class member
     if(root != nullptr){
         if(root->isLeaf()){
             output[root->c] = accumulator;
+            //unchoose last
+            // accumulator = accumulator.substr(accumulator.length() - 1);
+        } else {
+            accumulator += "0"; //choose 0
+            encodingHelper(root->zero, accumulator, output);
+            accumulator[accumulator.length() - 1] = '1'; //unchoose 0    choose 1
+            encodingHelper(root->one, accumulator, output);
+            accumulator = accumulator.substr(accumulator.length() - 1); //unchoose 1
         }
-
-        accumulator += "0"; //choose 0
-        encodingHelper(root->zero, accumulator, output);
-        accumulator[accumulator.length() - 1] = '1'; //unchoose 0    choose 1
-        encodingHelper(root->one, accumulator, output);
-        accumulator = accumulator.substr(accumulator.length() - 1); //unchoose 1
     }
 }
 
+// void HuffManTree::encodingHelper2(HuffmanNode* r, string accumulator, std::map<char, std::string>& output){}
+
 std::map<char, std::string> HuffmanTree::createEncodings() {
     if(charBinMap.size() == 0){
-    // std::map<char, std::string> charBinMap;
         std::string accumulator;
         encodingHelper(treeRoot, accumulator, charBinMap);
     }
@@ -126,7 +135,8 @@ void HuffmanTree::compress(ifstream* input, OBitStream* output) {
         input->read(&c, 1); 
         output->writeBits(createEncodings()[c]);
     }
-    
+    output->writeBits(createEncodings()[FILE_END]);
+    output->close(); //this shouldn't be my job
 }
 
 char decompHelper(HuffmanNode* root, IBitStream* input, OBitStream* output){   //eliminate root param if make class member
