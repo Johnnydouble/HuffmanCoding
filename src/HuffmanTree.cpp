@@ -42,7 +42,7 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
         uno = pq.top(); pq.pop();
         dos = pq.top(); pq.pop();
 
-        pq.push(new HuffmanNode('_', uno->freq + dos->freq, uno, dos));
+        pq.push(new HuffmanNode('*', uno->freq + dos->freq, uno, dos));
     }
 
     treeRoot = pq.top();
@@ -53,7 +53,7 @@ void addCharToTree(HuffmanNode*& root, std::istream* bits, char c){
     char curBit = bits->get();
     if(curBit == '\r' || curBit == '\n'){
         root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
-    } else if(curBit != -1) { //if the stream
+    } else if(curBit != -1) { //if the stream is NOT empty
         if(root == nullptr){
             root = new HuffmanNode(); 
         }
@@ -120,7 +120,7 @@ void condThrowNPE(bool shouldThrow, string message){
 
 void HuffmanTree::compress(ifstream* input, OBitStream* output) {
     condThrowNPE(input == nullptr || output == nullptr, 
-        "Neither parameter of decompress may be nullptr");
+        "Neither parameter of compress may be nullptr");
     char c;
     while (input->good()){
         input->read(&c, 1); 
@@ -145,7 +145,14 @@ char decompHelper(HuffmanNode* root, IBitStream* input, OBitStream* output){   /
 void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
     condThrowNPE(input == nullptr || output == nullptr, 
         "Neither parameter of decompress may be nullptr");
-    while(input->good()){
-        output->write(decompHelper(treeRoot, input, output));
+    bool notEOF = true;
+    char c;
+    while(notEOF){
+        c = decompHelper(treeRoot, input, output);
+        if(c == -1){
+            notEOF = false;
+        } else {
+            output->write(c);   
+        }
     }
 }
