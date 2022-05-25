@@ -8,7 +8,7 @@ class HuffmanTree {
     HuffmanNode* treeRoot;
     std::map<char, std::string> charBinMap;
 
-    void encodingHelper(HuffmanNode* root, string& accumulator, std::map<char, std::string>& output);
+    void encodingHelper(HuffmanNode* root, string accumulator, std::map<char, std::string>& output);
 public:
     HuffmanTree(std::map<char, int>& counts);
     HuffmanTree(std::istream* in);
