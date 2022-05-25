@@ -75,7 +75,7 @@ void addCharToTree(HuffmanNode*& root, std::istream* bits, char c) {
             addCharToTree(root->one, bits, c);
         }
         else {
-            cout << "FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | FUCK | " << endl; //                                                                                  remove
+            cout << "H H H H H H  H H HH H  H H H H H H H H H H  H H HH H  H H H H H H H H H H  H H HH H  H H H H " << endl; //                                                                                  remove
         }
     }
 }
