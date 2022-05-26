@@ -90,7 +90,7 @@ void trimLineEndings(std::string& str) {
     }
 }
 
-HuffmanTree::HuffmanTree(std::istream* in) {
+HuffmanTree::HuffmanTree(std::istream* in) : treeRoot(nullptr){
     string charData;
     string garbageData;
 
@@ -179,10 +179,16 @@ void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
     condThrowNPE(input, "input must not be nullptr for decompress");
     condThrowNPE(input, "output must not be nullptr for decompress");
     char c = FILE_END + 1;
+    char clast = FILE_END;
     while (c != FILE_END) {
         c = decompHelper(treeRoot, input, output);
         if(c != FILE_END){
+            if(clast == 'a' && c == 'y'){
+                cerr << "EOF BITCH";                                                                    //htop    
+            }
             output->write(c);
         }
+        clast = c;
     }
+    output->close();
 }
