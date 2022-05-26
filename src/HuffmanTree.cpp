@@ -74,11 +74,7 @@ void HuffmanTree::addCharToTree(HuffmanNode*& root, std::istream* bits, char c) 
         else if (curBit == '1') {
             addCharToTree(root->one, bits, c);
         }
-        else {
-            cout << "H H H H H H  H H HH H  H H H H H H H H H H  H H HH H  H H H H H H H H H H  H H HH H  H H H H " << endl; //                                                                                  remove
-            cout << curBit << endl;
-            cout << c << endl;
-        }
+        //else do nothing
     }
 }
 
@@ -148,6 +144,7 @@ void condThrowNPE(T* ptr, string message) {
 void HuffmanTree::compress(ifstream* input, OBitStream* output) {
     condThrowNPE(input, "input may not be nullptr for compress");
     condThrowNPE(output, "output may not be nullptr for compress");
+
     char c;
     createEncodings();
     while (input->good()) {
@@ -184,7 +181,7 @@ void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
         c = decompHelper(treeRoot, input, output);
         if(c != FILE_END){
             if(clast == 'a' && c == 'y'){
-                cerr << "EOF BITCH";                                                                    //htop    
+                cout << "";                                                                    //htop    
             }
             output->write(c);
         }
