@@ -59,7 +59,7 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     printBT(this->treeRoot);
 }
 
-void addCharToTree(HuffmanNode*& root, std::istream* bits, char c) {
+void HuffmanTree::addCharToTree(HuffmanNode*& root, std::istream* bits, char c) {
     char curBit = bits->get();
     if (curBit == '\r' || curBit == '\n') {
         root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
@@ -76,6 +76,8 @@ void addCharToTree(HuffmanNode*& root, std::istream* bits, char c) {
         }
         else {
             cout << "H H H H H H  H H HH H  H H H H H H H H H H  H H HH H  H H H H H H H H H H  H H HH H  H H H H " << endl; //                                                                                  remove
+            cout << curBit << endl;
+            cout << c << endl;
         }
     }
 }
@@ -101,7 +103,6 @@ HuffmanTree::HuffmanTree(std::istream* in) {
     }
 
     printBT(this->treeRoot);
-    cout << "REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | REMOVEME | " << endl;
 }
 
 // template<typename T>
@@ -148,12 +149,12 @@ void HuffmanTree::compress(ifstream* input, OBitStream* output) {
     condThrowNPE(input, "input may not be nullptr for compress");
     condThrowNPE(output, "output may not be nullptr for compress");
     char c;
+    createEncodings();
     while (input->good()) {
         input->read(&c, 1);
-        output->writeBits(createEncodings()[c]);
+        output->writeBits(charBinMap[c]);
     }
-    output->writeBits(createEncodings()[FILE_END]);
-    printBT(this->treeRoot);
+    output->writeBits(charBinMap[FILE_END]);
     output->close(); //this shouldn't be my job
 }
 
