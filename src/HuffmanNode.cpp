@@ -1,6 +1,6 @@
 #include "HuffmanNode.h"
 
-HuffmanNode::HuffmanNode(char c, int freq, HuffmanNode* zero,  HuffmanNode* one) :
+HuffmanNode::HuffmanNode(char c, int freq, HuffmanNode* zero, HuffmanNode* one) :
     c(c), freq(freq), zero(zero), one(one) {}
 
 bool HuffmanNode::isLeaf() const{

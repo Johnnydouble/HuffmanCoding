@@ -137,15 +137,16 @@ std::map<char, std::string> HuffmanTree::createEncodings() {
     return charBinMap;
 }
 
-void condThrowNPE(bool shouldThrow, string message) {
-    if (shouldThrow) {
+template<typename T>
+void condThrowNPE(T* ptr, string message) {
+    if (ptr == nullptr) {
         throw message;
     }
 }
 
 void HuffmanTree::compress(ifstream* input, OBitStream* output) {
-    condThrowNPE(input == nullptr || output == nullptr,
-        "Neither parameter of compress may be nullptr");
+    condThrowNPE(input, "input may not be nullptr for compress");
+    condThrowNPE(output, "output may not be nullptr for compress");
     char c;
     while (input->good()) {
         input->read(&c, 1);
@@ -165,23 +166,21 @@ char decompHelper(HuffmanNode* root, IBitStream* input, OBitStream* output) {   
         if (res == 1) {
             return decompHelper(root->one, input, output);
         }
-        else {
+        else if(res == 0) {
             return decompHelper(root->zero, input, output);
+        } else {
+            return FILE_END;
         }
     }
 }
 
 void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
-    condThrowNPE(input == nullptr || output == nullptr,
-        "Neither parameter of decompress may be nullptr");
-    bool notEOF = true;
-    char c;
-    while (notEOF) {
+    condThrowNPE(input, "input must not be nullptr for decompress");
+    condThrowNPE(input, "output must not be nullptr for decompress");
+    char c = FILE_END + 1;
+    while (c != FILE_END) {
         c = decompHelper(treeRoot, input, output);
-        if (c == FILE_END) {
-            notEOF = false;
-        }
-        else {
+        if(c != FILE_END){
             output->write(c);
         }
     }
