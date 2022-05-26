@@ -178,7 +178,7 @@ void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
     char c;
     while (notEOF) {
         c = decompHelper(treeRoot, input, output);
-        if (c == -1) {
+        if (c == FILE_END) {
             notEOF = false;
         }
         else {
