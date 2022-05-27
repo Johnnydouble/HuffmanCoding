@@ -1,3 +1,12 @@
+// HuffmanTree.cpp
+// Christen Spadavecchia
+// CS 133
+// 5/23/22
+// 
+// 
+// 
+// 
+
 #include "HuffmanTree.h"
 
 void printBT(const std::string& prefix, const HuffmanNode* node, bool isLeft) //                                     remove this
@@ -78,7 +87,7 @@ void HuffmanTree::addCharToTree(HuffmanNode*& root, std::istream* bits, char c) 
     }
 }
 
-void trimLineEndings(std::string& str) {
+void HuffmanTree::trimLineEndings(std::string& str) {
     for (int i = 0; i < str.length(); i++) {
         if (str[i] == '\r' || str[i] == '\n') {
             str.erase(i, 1);
@@ -92,9 +101,11 @@ HuffmanTree::HuffmanTree(std::istream* in) : treeRoot(nullptr){
 
     if (in->good()) {
         do {
-            *in >> charData;
-            std::getline(*in, garbageData); //hoover up line endings
-            addCharToTree(treeRoot, in, (char)stoi(charData));
+            getline(*in, charData);
+            trimLineEndings(charData);
+            if(charData.length() > 0){
+                addCharToTree(treeRoot, in, (char)stoi(charData));
+            }
         } while (in->good());
     }
 
@@ -135,7 +146,7 @@ std::map<char, std::string> HuffmanTree::createEncodings() {
 }
 
 template<typename T>
-void condThrowNPE(T* ptr, string message) {
+void HuffmanTree::condThrowNPE(T* ptr, string message) {
     if (ptr == nullptr) {
         throw message;
     }
@@ -155,17 +166,17 @@ void HuffmanTree::compress(ifstream* input, OBitStream* output) {
     output->close(); //this shouldn't be my job
 }
 
-char decompHelper(HuffmanNode* root, IBitStream* input, OBitStream* output) {   //eliminate root param if make class member
+char HuffmanTree::decompHelper(HuffmanNode* root, IBitStream* input) {   //eliminate root param if make class member
     if (root->isLeaf()) {
         return root->c;
     }
     else {
         int res = input->readBit();
         if (res == 1) {
-            return decompHelper(root->one, input, output);
+            return decompHelper(root->one, input);
         }
         else if(res == 0) {
-            return decompHelper(root->zero, input, output);
+            return decompHelper(root->zero, input);
         } else {
             return FILE_END;
         }
@@ -178,14 +189,31 @@ void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
     char c = FILE_END + 1;
     char clast = FILE_END;
     while (c != FILE_END) {
-        c = decompHelper(treeRoot, input, output);
+        c = decompHelper(treeRoot, input);
         if(c != FILE_END){
-            if(clast == 'a' && c == 'y'){
+            if(clast == 'd' && c == 'e'){
                 cout << "";                                                                    //htop    
             }
             output->write(c);
         }
+
+        if(c == FILE_END){
+            cout.flush();
+        }
+
         clast = c;
     }
     output->close();
+}
+
+void HuffmanTree::nodeMuncher(HuffmanNode*& node){
+    if(node != nullptr){
+        nodeMuncher(node->zero);
+        nodeMuncher(node->one);
+        delete node;
+    }
+}
+
+HuffmanTree::~HuffmanTree(){
+    nodeMuncher(treeRoot);
 }
