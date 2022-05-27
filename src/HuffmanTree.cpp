@@ -9,35 +9,35 @@
 
 #include "HuffmanTree.h"
 
-void printBT(const std::string& prefix, const HuffmanNode* node, bool isLeft) //                                     remove this
-{
-    if (node != nullptr)
-    {
-        std::cout << prefix;
+// void printBT(const std::string& prefix, const HuffmanNode* node, bool isLeft) //                                     remove this
+// {
+//     if (node != nullptr)
+//     {
+//         std::cout << prefix;
 
-        std::cout << (isLeft ? "├──" :"└──" );
+//         std::cout << (isLeft ? "├──" :"└──" );
 
-        // print the value of the node
-        if (node->c == '*') {
-            std::cout << "─┐" << std::endl;
-        }
-        else if (node->c == '\n') {
-            std::cout << "\\n" << std::endl;
-        }
-        else {
-            std::cout << node->c << std::endl;
-        }
+//         // print the value of the node
+//         if (node->c == '*') {
+//             std::cout << "─┐" << std::endl;
+//         }
+//         else if (node->c == '\n') {
+//             std::cout << "\\n" << std::endl;
+//         }
+//         else {
+//             std::cout << node->c << std::endl;
+//         }
 
-        // enter the next tree level - left and right branch
-        printBT(prefix + (isLeft ? "│   " : "    "), node->zero, true);
-        printBT(prefix + (isLeft ? "│   " : "    "), node->one, false);
-    }
-}
+//         // enter the next tree level - left and right branch
+//         printBT(prefix + (isLeft ? "│   " : "    "), node->zero, true);
+//         printBT(prefix + (isLeft ? "│   " : "    "), node->one, false);
+//     }
+// }
 
-void printBT(const HuffmanNode* node)
-{
-    printBT("", node, false);
-}
+// void printBT(const HuffmanNode* node)
+// {
+//     printBT("", node, false);
+// }
 
 
 
@@ -65,13 +65,13 @@ HuffmanTree::HuffmanTree(std::map<char, int>& counts) {
     }
 
     treeRoot = pq.top();
-    printBT(this->treeRoot);
+    // printBT(treeRoot);
 }
 
 void HuffmanTree::addCharToTree(HuffmanNode*& root, std::istream* bits, char c) {
     char curBit = bits->get();
     if (curBit == '\r' || curBit == '\n') {
-        root = new HuffmanNode(c, 5); //should be one entry per char, no nullptr check needed
+        root = new HuffmanNode(c); //should be one entry per char, no nullptr check needed
     }
     else /*if(curBit != FILE_END)*/ { //if the stream is NOT empty
         if (root == nullptr) {
@@ -82,6 +82,8 @@ void HuffmanTree::addCharToTree(HuffmanNode*& root, std::istream* bits, char c) 
         }
         else if (curBit == '1') {
             addCharToTree(root->one, bits, c);
+        } else {
+            cout << "SHOULD BE UNREACHABLE" << endl;
         }
         //else do nothing
     }
@@ -91,13 +93,13 @@ void HuffmanTree::trimLineEndings(std::string& str) {
     for (int i = 0; i < str.length(); i++) {
         if (str[i] == '\r' || str[i] == '\n') {
             str.erase(i, 1);
+            i--;                                                // HMMMM
         }
     }
 }
 
 HuffmanTree::HuffmanTree(std::istream* in) : treeRoot(nullptr){
     string charData;
-    string garbageData;
 
     if (in->good()) {
         do {
@@ -109,7 +111,7 @@ HuffmanTree::HuffmanTree(std::istream* in) : treeRoot(nullptr){
         } while (in->good());
     }
 
-    printBT(this->treeRoot);
+    // printBT(treeRoot);
 }
 
 // template<typename T>
@@ -187,18 +189,18 @@ void HuffmanTree::decompress(IBitStream* input, OBitStream* output) {
     condThrowNPE(input, "input must not be nullptr for decompress");
     condThrowNPE(input, "output must not be nullptr for decompress");
     char c = FILE_END + 1;
-    char clast = FILE_END;
+    char clast = FILE_END - 1;
     while (c != FILE_END) {
         c = decompHelper(treeRoot, input);
         if(c != FILE_END){
             if(clast == 'd' && c == 'e'){
-                cout << "";                                                                    //htop    
+                // cout << "";                                                                    //htop    
             }
             output->write(c);
         }
 
         if(c == FILE_END){
-            cout.flush();
+            // cout.flush();
         }
 
         clast = c;
